@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "kevscope"
+version = "0.1.0"
+description = "View QNX 8.0 kernel event traces in Perfetto and find what kept a thread waiting"
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "Apache-2.0" }
+dependencies = []
+
+[project.scripts]
+kevscope = "kevscope.__main__:main"
+
+[tool.setuptools]
+packages = ["kevscope"]

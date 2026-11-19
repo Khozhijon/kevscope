@@ -1,0 +1,11 @@
+kevscope
+Copyright 2026 Khozhijon
+
+Licensed under the Apache License, Version 2.0.
+
+This repository contains no QNX software, headers, documentation or captured
+traces. To build and run the demo you need your own QNX SDP 8.0 licence from
+BlackBerry QNX. QNX is a trademark of BlackBerry Limited. kevscope is an
+independent project, not affiliated with or endorsed by BlackBerry.
+
+Built with help from Claude Code (Anthropic).

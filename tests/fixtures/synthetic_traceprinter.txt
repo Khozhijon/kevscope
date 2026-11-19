@@ -1,0 +1,52 @@
+TRACEPRINTER version 1.02
+TRACEPARSER LIBRARY version 1.02
+ -- HEADER FILE INFORMATION --
+       TRACE_FILE_NAME:: synthetic-fixture.kev
+            TRACE_DATE:: Thu Nov 19 03:00:00 2026
+       TRACE_VER_MAJOR:: 1
+       TRACE_VER_MINOR:: 01
+   TRACE_LITTLE_ENDIAN:: TRUE
+        TRACE_ENCODING:: 16 byte events
+  TRACE_CYCLES_PER_SEC:: 1000000000
+         TRACE_CPU_NUM:: 2
+         TRACE_SYSNAME:: SYNTHETIC
+TRACE_TRACELOGGER_ARGS:: hand-written fixture, not a capture from a QNX system
+ -- KERNEL EVENTS --
+t:0xfffffc00 CPU:00 CONTROL: BUFFER sequence = 1, num_events = 29
+t:0xfffffc00 CPU:00 CONTROL :TIME msb:0x00000001 lsb(offset):0xfffffc00
+t:0xfffffc10 CPU:00 PROCESS :PROCCREATE_NAME
+                      ppid:0
+                       pid:1
+                      name:proc/boot/procnto-smp-instr
+t:0xfffffc20 CPU:00 THREAD  :THCREATE      pid:1 tid:1
+t:0xfffffc30 CPU:00 THREAD  :THREADY       pid:1 tid:1
+t:0xfffffc40 CPU:01 PROCESS :PROCCREATE_NAME
+                      ppid:1
+                       pid:4100
+                      name:usr/bin/demo server
+t:0xfffffc50 CPU:01 THREAD  :THRECEIVE     pid:4100 tid:1
+t:0xfffffc60 CPU:00 PROCESS :PROCCREATE_NAME
+                      ppid:1
+                       pid:8200
+                      name:./client
+t:0xfffffc70 CPU:00 THREAD  :THRUNNING     pid:8200 tid:1
+t:0xfffffd00 CPU:00 KER_CALL:MSG_SENDV/11 coid:0x00000003 msg:"" (0x00040116)
+t:0xfffffd80 CPU:00 COMM    :SND_MESSAGE   rcvid:0x0000004f pid:4100
+t:0xfffffe00 CPU:00 THREAD  :THREPLY       pid:8200 tid:1
+t:0xfffffe80 CPU:00 THREAD  :THREADY       pid:4100 tid:1
+t:0xffffff00 CPU:00 THREAD  :THRUNNING     pid:4100 tid:1
+t:0xffffff80 CPU:00 COMM    :REC_MESSAGE   rcvid:0x0000004f pid:4100
+t:0x00000100 CPU:00 CONTROL :TIME msb:0x00000002, lsb(offset):0x00000100
+t:0x00000200 CPU:00 INT_ENTR:0x00000000 (0)       IP:0xf008433e
+t:0x00000280 CPU:00 INT_HANDLER_ENTR:0x00000000 (0)       PID:1 IP:0xf0056570 AREA:0x00000000
+t:0x00000300 CPU:00 INT_HANDLER_EXIT:0x00000000 (0) SIGEVENT:NONE
+t:0x00000380 CPU:00 INT_EXIT:0x00000000 (0) inkernel:0x00000f01
+t:0x00000400 CPU:00 KER_CALL:MSG_REPLYV/15 rcvid:0x0000004f status:0x00000000
+t:0x00000480 CPU:00 COMM    :REPLY_MESSAGE tid:1 pid:8200
+t:0x00000500 CPU:00 THREAD  :THREADY       pid:8200 tid:1
+t:0x00000580 CPU:00 KER_EXIT:MSG_REPLYV/15 ret_val:0x00000000 empty:0x00000000
+t:0x00000600 CPU:00 THREAD  :THRECEIVE     pid:4100 tid:1
+t:0x00000700 CPU:00 THREAD  :THRUNNING     pid:8200 tid:1
+t:0x00000780 CPU:00 KER_EXIT:MSG_SENDV/11 status:0x00000000 rmsg:"" (0x00000000)
+t:0x00000800 CPU:00 THREAD  :THDEAD        pid:8200 tid:1
+t:0x00000900 CPU:00 PROCESS :PROCDESTROY   ppid:1 pid:8200

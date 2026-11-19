@@ -1,0 +1,16 @@
+# never publish QNX material or local working files
+notes/
+drafts/
+targets/
+captures/
+*.kev
+*.img
+*.qcow2
+*.ifs
+__pycache__/
+*.pyc
+.DS_Store
+*.mp4
+*.mov
+workload/build/
+.claude/
