@@ -7,7 +7,10 @@
 # with QNX_USER / QNX_PASS. Needs sshpass (brew install sshpass).
 set -e
 PORT="${SSH_PORT:-2222}"; USER_="${QNX_USER:-root}"; export SSHPASS="${QNX_PASS:-root}"
+# Password login only: offering the host user's SSH keys first uses up the
+# server's authentication attempts and makes logins fail now and then.
 O="-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR -o ConnectTimeout=20"
+O="$O -o PubkeyAuthentication=no -o PreferredAuthentications=keyboard-interactive,password -o NumberOfPasswordPrompts=1"
 cmd="$1"; shift
 # The guest is emulated and can be slow to answer a login; retry copies a few times.
 retry() { n=0; until "$@"; do n=$((n + 1)); [ $n -ge 4 ] && return 1; sleep 2; done; }

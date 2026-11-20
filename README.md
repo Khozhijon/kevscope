@@ -10,6 +10,14 @@ Repository: https://github.com/Khozhijon/kevscope | Tutorial: [docs/codelab.md](
 
 The `rtdemo` workload traced on QNX 8.0 (aarch64, QEMU) and opened in ui.perfetto.dev: one state track and one kernel-call track per thread.
 
+One cycle of the priority inversion, exported with `convert --from ... --to ...`. `inv-high` (priority 18) is Mutex-blocked in `SYNC_MUTEX_LOCK`; `inv-low` holds the lock but is only Ready, because `inv-mid` (priority 12) is Running:
+
+![One priority inversion cycle in the Perfetto UI](docs/img/perfetto-inversion.png)
+
+The same program with `PTHREAD_PRIO_INHERIT`: `inv-low` inherits priority 18 and runs at once, and `inv-mid` waits its turn:
+
+![The same cycle with priority inheritance](docs/img/perfetto-inherit.png)
+
 ## Why
 
 QNX SDP 8.0 has no macOS host tools. The graphical view of a kernel trace, the System Profiler, lives in the Momentics IDE. None of the SDP's host tools run natively on a Mac, so a trace captured on a QNX target is hard to look at from there.
@@ -30,6 +38,8 @@ Four commands. All of them ran and are covered by tests.
 | `blame` | For one thread, shows which threads ran on the CPU it was waiting for while it was Ready or Mutex-blocked. This finds priority inversions. |
 
 The thread name for `blame` can be a thread name, part of "process: thread", or PID:TID.
+
+`convert --from SEC --to SEC` exports only a time window, which is the quick way to look at one event up close. `blame --shares` prints counts and shares without durations.
 
 ### Example: `blame`
 
@@ -189,7 +199,7 @@ traceprinter text -> decoder -> event model -> timeline -> exporter / analyses
 python3 -m unittest discover -s tests -t .
 ```
 
-49 tests pass. They cover the timeline, stats and exporter, the old-format decoder, the QNX 8.0 line forms, `blame` and the command line. The fixtures are hand-written, not captures.
+52 tests pass. They cover the timeline, stats and exporter, the old-format decoder, the QNX 8.0 line forms, time-window export, `blame` and the command line. The fixtures are hand-written, not captures.
 
 ## Licence and notices
 

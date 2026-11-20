@@ -25,6 +25,10 @@ def main(argv=None) -> int:
     c.add_argument("input", help="traceprinter text output, or a raw .kev file")
     c.add_argument("-o", "--output", required=True)
     c.add_argument("--no-kercalls", action="store_true", help="leave kernel calls out")
+    c.add_argument("--from", dest="t_from", type=float, metavar="SEC",
+                   help="export only the part of the trace from this time (seconds)")
+    c.add_argument("--to", dest="t_to", type=float, metavar="SEC",
+                   help="export only the part of the trace up to this time (seconds)")
     s = sub.add_parser("stats", help="print per-thread CPU time and scheduling latency")
     s.add_argument("input")
     s.add_argument("--top", type=int, default=20)
@@ -33,6 +37,9 @@ def main(argv=None) -> int:
     b.add_argument("input")
     b.add_argument("--thread", required=True,
                    help="thread name, part of 'process: thread', or PID:TID")
+    b.add_argument("--shares", action="store_true",
+                   help="print counts and shares only, no durations")
+    b.add_argument("--top", type=int, default=8)
     b.add_argument("--state", action="append",
                    help="waiting state to analyse (repeatable); default: Ready and mutex states")
     v = sub.add_parser("view", help="convert and open the trace in ui.perfetto.dev")
@@ -61,7 +68,8 @@ def main(argv=None) -> int:
         if key is None:
             print("error: " + why, file=sys.stderr)
             return 1
-        print(blame.report(tl, key, tuple(a.state) if a.state else blame.DEFAULT_STATES))
+        print(blame.report(tl, key, tuple(a.state) if a.state else blame.DEFAULT_STATES,
+                           top=a.top, times=not a.shares))
     elif a.cmd == "view":
         out_path = a.output or a.input + ".json"
         with open(out_path, "w") as out:
@@ -71,6 +79,9 @@ def main(argv=None) -> int:
                   "with 'Open trace file'." % out_path, file=sys.stderr)
             return 1
     else:
+        if a.t_from is not None or a.t_to is not None:
+            tl = timeline.clip(tl, int((a.t_from or 0.0) * 1e9),
+                               int(a.t_to * 1e9) if a.t_to is not None else tl.end_ts)
         with open(a.output, "w") as out:
             n = perfetto.write(tl, out, trace.header, kercalls=not a.no_kercalls)
         print("%d events in, %d trace events out -> %s" % (len(trace.events), n, a.output))

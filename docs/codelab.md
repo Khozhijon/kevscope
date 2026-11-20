@@ -231,6 +231,18 @@ Open https://ui.perfetto.dev, choose "Open trace file", and pick `captures/inver
 
 ![The rtdemo trace in the Perfetto UI](img/perfetto-rtdemo.png)
 
+The whole trace is dense. To look at one inversion cycle, export a short window around it (take the time from the `longest ... at t=` field that `blame` prints in Step 8) and open that file instead:
+
+```bash
+python3 -m kevscope convert captures/inversion.txt -o captures/inversion-zoom.json --from 2.568 --to 2.604
+```
+
+Your times will differ. This is what one cycle looks like:
+
+![One priority inversion cycle](img/perfetto-inversion.png)
+
+`inv-high` is Mutex-blocked inside `SYNC_MUTEX_LOCK`. `inv-low` holds the lock but is only Ready. `inv-mid`, which never touches the lock, is Running.
+
 What each track shows:
 
 - "CPUs" group: for each CPU, which thread ran, and a track of interrupt deliveries.
@@ -293,6 +305,8 @@ python3 -m kevscope blame captures/inherit.txt --thread inv-high --state Mutex-b
 ```
 
 What changes, qualitatively. In `blame`, `inv-mid` no longer takes most of the wait. Only the lock holder `inv-low` runs. In the timeline, `inv-low` inherits priority 18 while it holds the lock, so `inv-mid` can no longer cut in. The Mutex-blocked slice on `inv-high` no longer lines up with a Running slice on `inv-mid`.
+
+![The same cycle with priority inheritance](img/perfetto-inherit.png)
 
 `tools/demo.sh` does both runs and both `blame` reports in one go.
 

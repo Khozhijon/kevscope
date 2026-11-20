@@ -69,6 +69,33 @@ class Qnx8DecoderTest(unittest.TestCase):
         self.assertEqual(prio, [12, 12])
 
 
+class ClipTest(unittest.TestCase):
+    def test_window_is_trimmed_and_rebased(self):
+        full = timeline.build(load())
+        tl = timeline.clip(full, 0x500, 0x1100)
+        self.assertEqual(tl.end_ts, 0xC00)
+        self.assertEqual([(i.state, i.start, i.end) for i in tl.states[HIGH]],
+                         [("Running", 0, 0x100), ("Mutex-blocked", 0x100, 0xB00),
+                          ("Ready", 0xB00, 0xB80), ("Running", 0xB80, 0xC00)])
+        self.assertEqual([(i.state, i.start, i.end) for i in tl.states[MID]],
+                         [("Running", 0x100, 0x900), ("Sem-blocked", 0x900, 0xC00)])
+        (kc,) = tl.kercalls
+        self.assertEqual((kc.start, kc.end), (0, 0xC00))
+        self.assertEqual(tl.interrupts, [])          # the IRQ at 0x300 is outside
+        self.assertEqual(tl.user_events, [])
+        self.assertEqual(len(full.interrupts), 1)    # the original is untouched
+
+    def test_cli_window(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as d:
+            out = os.path.join(d, "w.json")
+            self.assertEqual(cli.main(["convert", FIXTURE, "-o", out,
+                                       "--from", "0.00000128", "--to", "0.000004352"]), 0)
+            with open(out) as f:
+                ev = json.load(f)["traceEvents"]
+            self.assertEqual(max(e["ts"] + e.get("dur", 0) for e in ev if "ts" in e), 3.072)
+
+
 class BlameTest(unittest.TestCase):
     def setUp(self):
         self.tl = timeline.build(load())
@@ -100,6 +127,15 @@ class BlameTest(unittest.TestCase):
         self.assertIn("demo: mid", text)
         self.assertIn("80.0%", text)
         self.assertIn("never in", blame.report(self.tl, MID, ("Mutex-blocked",)))
+
+    def test_shares_only_report_has_no_durations(self):
+        text = blame.report(self.tl, HIGH, ("Mutex-blocked",), times=False)
+        self.assertIn("Mutex-blocked: 1 time", text)
+        self.assertIn("demo: mid", text)
+        self.assertIn(" 80%", text)
+        self.assertIn("###################.....", text)
+        for unit in (" ns", " us", " ms", " s "):
+            self.assertNotIn(unit, text)
 
     def test_cli(self):
         self.assertEqual(cli.main(["blame", FIXTURE, "--thread", "high"]), 0)

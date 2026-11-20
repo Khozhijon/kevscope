@@ -106,8 +106,15 @@ def blame(tl: Timeline, key: ThreadKey, states: Sequence[str] = DEFAULT_STATES) 
     return [out[s] for s in states if s in out]
 
 
+def _bar(share: float, width: int = 24) -> str:
+    n = int(round(share * width))
+    return "#" * n + "." * (width - n)
+
+
 def report(tl: Timeline, key: ThreadKey, states: Sequence[str] = DEFAULT_STATES,
-           top: int = 8) -> str:
+           top: int = 8, times: bool = True) -> str:
+    """Text report. With times=False only counts and shares are printed (no
+    durations), for output that will be shown where measurements should not be."""
     who = "%s: %s (pid %d tid %d)" % (tl.proc_label(key[0]), tl.thread_label(key), key[0], key[1])
     results = blame(tl, key, states)
     if not results:
@@ -115,9 +122,13 @@ def report(tl: Timeline, key: ThreadKey, states: Sequence[str] = DEFAULT_STATES,
     lines: List[str] = [who]
     for b in results:
         lines.append("")
-        lines.append("  %s: %d time%s, %s in total, longest %s at t=%s"
-                     % (b.state, b.waits, "" if b.waits == 1 else "s", fmt_ns(b.total),
-                        fmt_ns(b.longest), fmt_ns(b.longest_at)))
+        plural = "" if b.waits == 1 else "s"
+        if times:
+            lines.append("  %s: %d time%s, %s in total, longest %s at t=%s"
+                         % (b.state, b.waits, plural, fmt_ns(b.total),
+                            fmt_ns(b.longest), fmt_ns(b.longest_at)))
+        else:
+            lines.append("  %s: %d time%s" % (b.state, b.waits, plural))
         ranked = sorted(b.ran.items(), key=lambda kv: kv[1], reverse=True)
         if not ranked:
             lines.append("  nothing else ran on the CPU it was waiting for (not traced, or the "
@@ -128,7 +139,11 @@ def report(tl: Timeline, key: ThreadKey, states: Sequence[str] = DEFAULT_STATES,
             label = "%s: %s" % (tl.proc_label(other[0]), tl.thread_label(other))
             if is_idle(tl, other):
                 label += "  (idle)"
-            lines.append("    %-44s %10s  %5.1f%%" % (label[:44], fmt_ns(ns), 100.0 * ns / b.total))
+            share = ns / b.total
+            if times:
+                lines.append("    %-44s %10s  %5.1f%%" % (label[:44], fmt_ns(ns), 100.0 * share))
+            else:
+                lines.append("    %-28s %s %3.0f%%" % (label[:28], _bar(share), 100.0 * share))
         if len(ranked) > top:
             lines.append("    ... and %d more" % (len(ranked) - top))
     return "\n".join(lines)

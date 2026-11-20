@@ -175,6 +175,35 @@ def build(trace: m.Trace) -> Timeline:
     return tl
 
 
+def clip(tl: Timeline, t0: int, t1: int) -> Timeline:
+    """A copy of `tl` cut down to the window [t0, t1) nanoseconds, with times
+    shifted so that the window starts at zero. Intervals that cross the edges
+    are trimmed; flows are kept only if both ends are inside."""
+    t0 = max(0, t0)
+    t1 = min(max(t1, t0), tl.end_ts)
+    out = Timeline(end_ts=t1 - t0, proc_names=dict(tl.proc_names),
+                   thread_names=dict(tl.thread_names), cpus=list(tl.cpus),
+                   unmatched=dict(tl.unmatched))
+    for key, ivs in tl.states.items():
+        kept = [Interval(max(iv.start, t0) - t0, min(iv.end, t1) - t0, iv.state, iv.cpu, iv.priority)
+                for iv in ivs if iv.end > t0 and iv.start < t1]
+        if kept:
+            out.states[key] = kept
+
+    def cut(slices: List[Slice]) -> List[Slice]:
+        return [Slice(max(s.start, t0) - t0, min(s.end, t1) - t0, s.name, s.cpu, s.thread)
+                for s in slices if s.end >= t0 and s.start < t1 and (s.end > t0 or s.start >= t0)]
+
+    out.interrupts = cut(tl.interrupts)
+    out.kercalls = [s for s in cut(tl.kercalls) if s.thread in out.states]
+    out.flows = [Flow(f.kind, f.start - t0, f.src, f.end - t0, f.dst)
+                 for f in tl.flows if f.start >= t0 and f.end < t1]
+    for u in tl.user_events:
+        if t0 <= u.ts < t1:
+            out.user_events.append(m.Event(u.ts - t0, u.cpu, u.cls, u.name, dict(u.args)))
+    return out
+
+
 def _who(tl: "Timeline", key: Optional[ThreadKey]) -> str:
     return "" if key is None else "%s: %s" % (tl.proc_label(key[0]), tl.thread_label(key))
 
