@@ -24,7 +24,15 @@ You need no earlier QNX experience. You should know C and what a mutex is.
 - About 6 GB of free disk. The SDP baseline alone is 3.6 GB.
 - Python 3.9 or newer.
 
-This tutorial uses the kevscope repository for its scripts. Clone it first [TODO: repo URL] and run every command from its top directory.
+This tutorial uses the kevscope repository for its scripts. Clone it first and run every command from its top directory:
+
+```bash
+git clone https://github.com/Khozhijon/kevscope.git
+```
+
+```bash
+cd kevscope
+```
 
 Install the two Homebrew packages:
 
@@ -221,7 +229,7 @@ You should now have: `captures/inversion.kev`, `captures/inversion.txt` and `cap
 
 Open https://ui.perfetto.dev, choose "Open trace file", and pick `captures/inversion.json`. (`python3 -m kevscope view captures/inversion.txt` serves the file locally instead. That path was not confirmed end to end, because Chrome asks for a local-network permission that needs a click. The "Open trace file" route was confirmed.)
 
-[TODO: add docs/img/perfetto-rtdemo.png, the rtdemo trace in Perfetto]
+![The rtdemo trace in the Perfetto UI](img/perfetto-rtdemo.png)
 
 What each track shows:
 

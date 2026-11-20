@@ -4,11 +4,11 @@ kevscope turns a kernel event trace from QNX SDP 8.0 into a timeline you can ope
 
 Built with help from Claude Code (Anthropic).
 
-[TODO: repo URL] | [TODO: demo video URL] | [codelab](docs/codelab.md)
+Repository: https://github.com/Khozhijon/kevscope | Tutorial: [docs/codelab.md](docs/codelab.md)
 
 ![kevscope trace of the rtdemo workload in the Perfetto UI](docs/img/perfetto-rtdemo.png)
 
-[TODO: add docs/img/perfetto-rtdemo.png, a screenshot of the rtdemo trace in ui.perfetto.dev]
+The `rtdemo` workload traced on QNX 8.0 (aarch64, QEMU) and opened in ui.perfetto.dev: one state track and one kernel-call track per thread.
 
 ## Why
 
@@ -156,10 +156,6 @@ Confirmed by opening a real QNX 8.0 trace in ui.perfetto.dev.
 - Flow arrows for message passing: MsgSend client to server receive, and server MsgReply to the client running again.
 - User trace events (`trace_logf`) as global markers with their text.
 - Thread names and priorities in slice details.
-
-![QNX 8.0 booting in QEMU on a Mac](docs/img/qnx-boot.png)
-
-[TODO: add docs/img/qnx-boot.png, a screenshot of the QEMU console showing the boot line]
 
 ## How it works
 
