@@ -4,7 +4,7 @@ kevscope turns a kernel event trace from QNX SDP 8.0 into a timeline you can ope
 
 Built with help from Claude Code (Anthropic).
 
-Repository: https://github.com/Khozhijon/kevscope | Tutorial: [docs/codelab.md](docs/codelab.md)
+Repository: https://github.com/Khozhijon/kevscope | Demo video (2 min): https://youtu.be/d3WG5kz5NG0 | Tutorial: [docs/codelab.md](docs/codelab.md)
 
 ![kevscope trace of the rtdemo workload in the Perfetto UI](docs/img/perfetto-rtdemo.png)
 
