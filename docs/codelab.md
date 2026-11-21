@@ -262,6 +262,8 @@ Looking works, but you can ask the question directly:
 python3 -m kevscope blame captures/inversion.txt --thread inv-high --state Mutex-blocked
 ```
 
+Add `--shares` to print only counts and shares, without durations, for example when you want to show the result to someone else.
+
 I cannot show the real output here, because the QNX licence does not allow publishing measurements. This is the same command on the hand-written test fixture, not measured on QNX:
 
 ```
@@ -319,7 +321,7 @@ You should now have: a second trace in which `blame` shows only `inv-low` on the
 - The password prompt in a terminal was confusing: `docker/sdp.sh login` uses a macOS dialog for that reason.
 - QEMU asserts in `gic_v3.c`, or QEMU refuses GICv2: you used `ACCEL=hvf`. Use the default, TCG.
 - QEMU says it has no machine `virt-4.2`: that is `mkqnximage`'s own runner. Use `tools/qemu-run.sh`, which uses `virt-8.2`.
-- The first `scp` after a run says "Permission denied": `tools/target.sh` retries up to four times. Wait and run it again.
+- `ssh` or `scp` to the target says "Permission denied" now and then: your own SSH keys were offered first and used up the login attempts. `tools/target.sh` turns key login off and retries copies up to four times; if you call `ssh` yourself, add `-o PubkeyAuthentication=no`.
 - `kevscope` says it cannot decode a raw `.kev` file: run `traceprinter` first.
 - `view` opens a tab but the trace does not load: Chrome may be waiting for you to allow ui.perfetto.dev to reach the local network. Or use "Open trace file" with the JSON.
 - The guest is slow: it is emulated under TCG. Be patient with SSH logins.

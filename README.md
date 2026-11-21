@@ -190,7 +190,7 @@ traceprinter text -> decoder -> event model -> timeline -> exporter / analyses
 - The `view` local-server path was not confirmed end to end. Chrome asks once for permission for ui.perfetto.dev to reach the local network, and that needs a human click. Opening the JSON with "Open trace file" was confirmed.
 - Flow arrows were imported (Perfetto's SQL counts matched what was written) but were not inspected visually.
 - Tested on one Mac only (Apple M5, macOS 27.2, Docker Desktop 29.9, QEMU 11.1.3).
-- The first `scp` after a run sometimes fails with "Permission denied". `tools/target.sh` retries.
+- Logins to the test VM sometimes failed with "Permission denied" when SSH offered the host's own keys first. `tools/target.sh` now uses password login only and retries copies.
 - No measurements from QNX are published here, because of the licence terms.
 
 ## Tests
